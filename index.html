@@ -11,12 +11,45 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
-  body { background: #f8f7f2; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  body { background: #f8f7f2; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; -webkit-text-size-adjust: 100%; }
   ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
   @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes typing-dot { 0%,80%,100%{opacity:0.2;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
+
+  /* NYT header — desktop defaults */
+  .nyt-top { padding: 8px 40px; }
+  .nyt-logo { font-size: 28px; }
+  .nyt-nav-bottom { gap: 24px; padding: 6px 0; justify-content: center; }
+  .article-col { max-width: 680px; margin: 0 auto; padding: 28px 24px 80px; }
+  .article-headline { font-size: 38px; }
+  .article-dek { font-size: 17px; }
+  .article-body-p { font-size: 15px; line-height: 1.8; }
+  .article-hero { height: 380px; }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .nyt-top { padding: 8px 14px !important; gap: 8px; }
+    .nyt-logo { font-size: 19px !important; letter-spacing: -0.3px !important; }
+    .nyt-side-left, .nyt-side-right { display: none !important; }
+    .nyt-nav-bottom {
+      gap: 18px !important;
+      padding: 8px 14px !important;
+      overflow-x: auto;
+      flex-wrap: nowrap !important;
+      justify-content: flex-start !important;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .nyt-nav-bottom::-webkit-scrollbar { display: none; }
+    .nyt-nav-item { flex-shrink: 0; }
+    .article-col { padding: 20px 18px 60px !important; }
+    .article-headline { font-size: 26px !important; line-height: 1.2 !important; }
+    .article-dek { font-size: 15px !important; }
+    .article-body-p { font-size: 16px !important; line-height: 1.65 !important; }
+    .article-hero { height: 220px !important; }
+  }
 </style>
 </head>
 <body>
@@ -44,11 +77,11 @@ const TIMES = "'Times New Roman', Georgia, serif";
 
 // ── NYT sources ───────────────────────────────────────────
 const SOURCES = [
-  { title: 'Heat Kills More Americans Than Any Other Weather', short: 'Heat & Mortality', url: 'https://www.nytimes.com/2022/06/09/climate/heat-wave-deaths.html', date: 'Jun 9, 2022' },
-  { title: 'The Economic Toll of a Warming World', short: 'Economic Toll', url: 'https://www.nytimes.com/2023/05/14/climate/economic-cost-climate-change.html', date: 'May 14, 2023' },
-  { title: 'How Extreme Heat Is Reshaping Global Work', short: 'Reshaping Work', url: 'https://www.nytimes.com/2024/07/22/business/economy/heat-wave-workers.html', date: 'Jul 22, 2024' },
-  { title: 'What Scientists Know About Heat and the Body', short: 'Heat & Health', url: 'https://www.nytimes.com/2023/08/08/health/heat-wave-body-health.html', date: 'Aug 8, 2023' },
-  { title: 'Crops Are Failing. Heat Is a Major Reason Why.', short: 'Crops Failing', url: 'https://www.nytimes.com/2024/09/03/climate/crops-failing-heat-agriculture.html', date: 'Sep 3, 2024' },
+  { title: 'Heat Kills More Americans Than Any Other Weather', short: 'Heat & Mortality', url: 'https://www.nytimes.com/2022/06/09/climate/heat-wave-deaths.html', date: 'Jun 9, 2022', snippet: 'More than 700 heat-related deaths occur each year in the U.S. on average — a figure that has climbed steadily over the past two decades as temperatures rise.' },
+  { title: 'The Economic Toll of a Warming World', short: 'Economic Toll', url: 'https://www.nytimes.com/2023/05/14/climate/economic-cost-climate-change.html', date: 'May 14, 2023', snippet: 'Global extreme heat costs could reach $3.1 trillion annually by 2035, with labor productivity losses alone accounting for more than half of the projected damages.' },
+  { title: 'How Extreme Heat Is Reshaping Global Work', short: 'Reshaping Work', url: 'https://www.nytimes.com/2024/07/22/business/economy/heat-wave-workers.html', date: 'Jul 22, 2024', snippet: 'Construction, agriculture, and logistics workers face the steepest productivity declines. Infrastructure strain on roads and power grids compounds the losses.' },
+  { title: 'What Scientists Know About Heat and the Body', short: 'Heat & Health', url: 'https://www.nytimes.com/2023/08/08/health/heat-wave-body-health.html', date: 'Aug 8, 2023', snippet: 'Heat-related ER visits have surged in heat-prone regions, with the elderly, outdoor workers, and those with chronic conditions most at risk during prolonged waves.' },
+  { title: 'Crops Are Failing. Heat Is a Major Reason Why.', short: 'Crops Failing', url: 'https://www.nytimes.com/2024/09/03/climate/crops-failing-heat-agriculture.html', date: 'Sep 3, 2024', snippet: 'Agricultural losses from heat stress could cost the U.S. $2.1B annually by 2040, with global losses reaching an estimated $14B per year by 2035.' },
 ];
 
 const SUGGESTIONS = [
@@ -65,12 +98,12 @@ const FEATURED = {
   a: [
     { text: 'Global extreme heat costs could reach ' },
     { text: '$3.1 trillion annually by 2035', bold: true },
-    { text: ', driven by labor productivity losses ' },
-    { cite: 'NYT · Jun 2022' },
-    { text: ', healthcare surges ' },
-    { cite: 'NYT · Aug 2023' },
-    { text: ', and widespread crop failures ' },
-    { cite: 'NYT · Sep 2024' },
+    { text: ', driven by labor productivity losses' },
+    { cite: 0 },
+    { text: ', healthcare surges' },
+    { cite: 3 },
+    { text: ', and widespread crop failures' },
+    { cite: 4 },
     { text: '.' },
   ],
   sources: [0, 1, 4],
@@ -83,10 +116,10 @@ const makeResponse = (q) => ({
     [
       { text: 'Extreme heat reduces labor productivity in outdoor industries by up to ' },
       { text: '12%', bold: true },
-      { text: ' on days exceeding 95°F ' },
-      { cite: 'NYT · Jun 2022' },
-      { text: ', while healthcare costs rise significantly from heat-related ER visits ' },
-      { cite: 'NYT · Aug 2023' },
+      { text: ' on days exceeding 95°F' },
+      { cite: 0 },
+      { text: ', while healthcare costs rise significantly from heat-related ER visits' },
+      { cite: 3 },
       { text: '.' },
     ],
     [
@@ -94,12 +127,12 @@ const makeResponse = (q) => ({
       { text: '$2.1B annually by 2040', bold: true },
       { text: ', with global losses reaching ' },
       { text: '$14B/yr by 2035', bold: true },
-      { cite: 'NYT · Sep 2024' },
+      { cite: 4 },
       { text: '.' },
     ],
     [
       { text: 'Infrastructure strain on roads, power grids, and water systems adds compounding costs during extreme heat events' },
-      { cite: 'NYT · Jul 2024' },
+      { cite: 2 },
       { text: '.' },
     ],
   ],
@@ -137,20 +170,124 @@ const ChevronDown = ({ size = 10, color = T.muted }) => (
   </svg>
 );
 
+// ── Citation (expandable superscript) ──────────────────────
+const Cite = ({ sourceIdx }) => {
+  const [open, setOpen] = React.useState(false);
+  const [pos, setPos] = React.useState({ left: 0, above: false });
+  const wrapRef = React.useRef(null);
+  const src = SOURCES[sourceIdx];
+  if (!src) return null;
+
+  React.useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+    };
+    const t = setTimeout(() => document.addEventListener('mousedown', handler), 0);
+    return () => { clearTimeout(t); document.removeEventListener('mousedown', handler); };
+  }, [open]);
+
+  const toggle = (e) => {
+    e.stopPropagation();
+    if (open) { setOpen(false); return; }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const popW = Math.min(320, window.innerWidth - 24);
+    // Horizontal: shift left if would overflow right edge
+    const overflowRight = rect.left + popW - (window.innerWidth - 12);
+    const left = overflowRight > 0 ? -overflowRight : 0;
+    // Vertical: flip above if would overflow bottom
+    const popH = 150;
+    const above = rect.bottom + popH > window.innerHeight - 12 && rect.top > popH + 12;
+    setPos({ left, above });
+    setOpen(true);
+  };
+
+  return (
+    <span ref={wrapRef} style={{ position: 'relative', display: 'inline' }}>
+      <sup
+        onClick={toggle}
+        style={{
+          display: 'inline-block',
+          background: open ? T.purple : T.citeBg,
+          color: open ? '#fff' : T.citeText,
+          fontSize: 9, fontWeight: 700, fontFamily: SYS,
+          padding: '0 4px', borderRadius: 8,
+          marginLeft: 2, cursor: 'pointer',
+          minWidth: 14, lineHeight: '14px',
+          textAlign: 'center',
+          transition: 'background 0.12s, color 0.12s',
+          userSelect: 'none',
+          verticalAlign: 'super',
+          top: 0,
+        }}>{sourceIdx + 1}</sup>
+
+      {open && (
+        <span
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'absolute',
+            [pos.above ? 'bottom' : 'top']: '100%',
+            left: pos.left,
+            marginTop: pos.above ? 0 : 6,
+            marginBottom: pos.above ? 6 : 0,
+            width: 'min(320px, calc(100vw - 24px))',
+            background: '#fff',
+            border: `1px solid ${T.border}`,
+            borderRadius: 10,
+            boxShadow: '0 10px 32px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.05)',
+            padding: '11px 13px',
+            zIndex: 150,
+            fontFamily: SYS,
+            display: 'block',
+            animation: 'fadeIn 0.14s ease',
+            textAlign: 'left',
+            whiteSpace: 'normal',
+            verticalAlign: 'baseline',
+            cursor: 'default',
+          }}>
+          {/* Title row with number + link */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 7, alignItems: 'flex-start' }}>
+            <span style={{
+              flexShrink: 0, marginTop: 2,
+              background: T.citeBg, color: T.citeText,
+              fontSize: 10, fontWeight: 700,
+              padding: '0 5px', borderRadius: 8,
+              minWidth: 16, height: 15, lineHeight: '15px',
+              display: 'inline-block', textAlign: 'center',
+            }}>{sourceIdx + 1}</span>
+            <a
+              href={src.url} target="_blank" rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                flex: 1, color: T.ink, textDecoration: 'none',
+                fontSize: 13, fontWeight: 600, lineHeight: 1.35,
+              }}>
+              {src.title}
+              <svg width="10" height="10" viewBox="0 0 11 11" fill="none" style={{ marginLeft: 4, flexShrink: 0, display: 'inline-block', verticalAlign: 'baseline' }}>
+                <path d="M4 2h5v5M9 2l-6 6" stroke={T.purple} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </a>
+          </div>
+          {/* Source meta */}
+          <div style={{ fontSize: 11, color: T.muted, marginBottom: 7, display: 'flex', alignItems: 'center', gap: 5 }}>
+            <FileIcon size={9} color={T.muted}/>
+            The New York Times · {src.date}
+          </div>
+          {/* Snippet preview */}
+          <div style={{ fontSize: 12, color: '#444', lineHeight: 1.5 }}>
+            {src.snippet}
+          </div>
+        </span>
+      )}
+    </span>
+  );
+};
+
 // ── Rich text renderer ─────────────────────────────────────
 const RichText = ({ parts }) => (
   <span>
     {parts.map((p, i) => {
-      if (p.cite) return (
-        <span key={i} style={{
-          display: 'inline-flex', alignItems: 'center',
-          background: T.citeBg, color: T.citeText,
-          fontSize: 10, fontWeight: 600, fontFamily: SYS,
-          padding: '1px 6px', borderRadius: 10,
-          marginLeft: 2, verticalAlign: 'middle', cursor: 'pointer',
-          border: '1px solid rgba(90,80,160,0.15)'
-        }}>{p.cite}</span>
-      );
+      if (typeof p.cite === 'number') return <Cite key={i} sourceIdx={p.cite} />;
       if (p.bold) return <b key={i}>{p.text}</b>;
       return <span key={i}>{p.text}</span>;
     })}
@@ -658,42 +795,42 @@ function App() {
 
       {/* NYT Header */}
       <div style={{ borderBottom: '1px solid #121212', background: '#fff', position: 'sticky', top: 0, zIndex: 10 }}>
-        <div style={{ padding: '8px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ display: 'flex', gap: 16 }}>
+        <div className="nyt-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: 1200, margin: '0 auto' }}>
+          <div className="nyt-side-left" style={{ display: 'flex', gap: 16, flexShrink: 0 }}>
             {['SECTIONS', 'SEARCH'].map(l => (
               <span key={l} style={{ fontSize: 10, fontFamily: SYS, fontWeight: 700, color: '#121212', letterSpacing: 0.5, cursor: 'pointer' }}>{l}</span>
             ))}
           </div>
-          <div style={{ fontFamily: TIMES, fontSize: 28, fontWeight: 700, color: '#121212', letterSpacing: -0.5 }}>The New York Times</div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div className="nyt-logo" style={{ fontFamily: TIMES, fontWeight: 700, color: '#121212', letterSpacing: -0.5, whiteSpace: 'nowrap' }}>The New York Times</div>
+          <div className="nyt-side-right" style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
             <div style={{ padding: '5px 14px', background: '#121212', color: '#fff', fontSize: 11, fontFamily: SYS, fontWeight: 600, borderRadius: 2, cursor: 'pointer' }}>SUBSCRIBE</div>
             <div style={{ padding: '5px 14px', border: '1px solid #121212', fontSize: 11, fontFamily: SYS, fontWeight: 600, borderRadius: 2, cursor: 'pointer' }}>LOG IN</div>
           </div>
         </div>
-        <div style={{ borderTop: '1px solid #ddd', display: 'flex', gap: 24, justifyContent: 'center', padding: '6px 0' }}>
+        <div className="nyt-nav-bottom" style={{ borderTop: '1px solid #ddd', display: 'flex' }}>
           {['U.S.', 'World', 'Business', 'Arts', 'Science', 'Sports', 'Opinion', 'Audio', 'Games'].map(n => (
-            <span key={n} style={{ fontSize: 11, color: '#121212', fontFamily: SYS, fontWeight: 500, cursor: 'pointer' }}>{n}</span>
+            <span key={n} className="nyt-nav-item" style={{ fontSize: 11, color: '#121212', fontFamily: SYS, fontWeight: 500, cursor: 'pointer' }}>{n}</span>
           ))}
         </div>
       </div>
 
       {/* Article */}
-      <div style={{ maxWidth: 680, margin: '0 auto', padding: '28px 24px 80px' }}>
+      <div className="article-col">
 
         {/* Byline */}
         <div style={{ fontSize: 11, fontFamily: SYS, color: '#6e6e6e', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Science · Climate</div>
 
         {/* Headline */}
-        <h1 style={{ fontSize: 38, fontWeight: 700, lineHeight: 1.15, color: '#121212', fontFamily: TIMES, marginBottom: 14 }}>
+        <h1 className="article-headline" style={{ fontWeight: 700, lineHeight: 1.15, color: '#121212', fontFamily: TIMES, marginBottom: 14 }}>
           The Hidden Cost of Extreme Heat: What New Research Reveals
         </h1>
 
         {/* Dek */}
-        <p style={{ fontSize: 17, color: '#444', fontFamily: TIMES, fontStyle: 'italic', marginBottom: 12, lineHeight: 1.5 }}>
+        <p className="article-dek" style={{ color: '#444', fontFamily: TIMES, fontStyle: 'italic', marginBottom: 12, lineHeight: 1.5 }}>
           A sweeping new analysis finds that rising temperatures are costing the global economy trillions — and the toll is accelerating faster than models predicted.
         </p>
 
-        <div style={{ fontSize: 12, color: '#6e6e6e', fontFamily: SYS, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ fontSize: 12, color: '#6e6e6e', fontFamily: SYS, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           By <b style={{ color: '#121212' }}>Sarah Mitchell</b>
           <span>·</span> April 18, 2026
           <span>·</span> 8 min read
@@ -702,29 +839,29 @@ function App() {
         <div style={{ height: 1, background: '#121212', marginBottom: 22 }}/>
 
         {/* Hero image */}
-        <div style={{ height: 380, background: 'linear-gradient(160deg, #c8d5e8 0%, #b0bfcc 100%)', borderRadius: 3, marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div className="article-hero" style={{ background: 'linear-gradient(160deg, #c8d5e8 0%, #b0bfcc 100%)', borderRadius: 3, marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.2) 100%)' }}/>
           <span style={{ fontFamily: "'Caveat', cursive", color: 'rgba(255,255,255,0.6)', fontSize: 16, position: 'relative' }}>photo — construction workers in heat, Phoenix AZ</span>
         </div>
         <div style={{ fontSize: 11, color: '#6e6e6e', fontFamily: SYS, marginBottom: 22 }}>Workers take shelter from 108°F heat in Phoenix, July 2025. <span style={{ color: '#999' }}>Credit: AP / David Wallace</span></div>
 
         {/* Article body */}
-        <p style={{ fontSize: 15, lineHeight: 1.8, color: '#222', fontFamily: TIMES, marginBottom: 18 }}>
+        <p className="article-body-p" style={{ color: '#222', fontFamily: TIMES, marginBottom: 18 }}>
           On a sweltering July morning, workers at a Phoenix construction site put down their tools two hours early. It was only 10 a.m., but the temperature had already reached 108°F. New research from Stanford and the WHO suggests such scenes will become routine — and the economic toll is far larger than previously understood.
         </p>
 
-        <p style={{ fontSize: 15, lineHeight: 1.8, color: '#222', fontFamily: TIMES, marginBottom: 18 }}>
+        <p className="article-body-p" style={{ color: '#222', fontFamily: TIMES, marginBottom: 18 }}>
           The analysis, which synthesizes data from more than 200 studies, finds that extreme heat already costs the global economy an estimated $1.6 trillion annually — a figure expected to nearly double by 2035 if current emission trajectories hold.
         </p>
 
         {/* ── THE EMBED ── */}
         <EmbedWidget/>
 
-        <p style={{ fontSize: 15, lineHeight: 1.8, color: '#222', fontFamily: TIMES, marginBottom: 18 }}>
+        <p className="article-body-p" style={{ color: '#222', fontFamily: TIMES, marginBottom: 18 }}>
           "The numbers are stark," said Dr. Priya Mehta, lead author of the WHO report. "We have been underestimating heat's economic drag for decades. Every model we've built has turned out to be too conservative."
         </p>
 
-        <p style={{ fontSize: 15, lineHeight: 1.8, color: '#222', fontFamily: TIMES, marginBottom: 18 }}>
+        <p className="article-body-p" style={{ color: '#222', fontFamily: TIMES, marginBottom: 18 }}>
           The consequences extend far beyond the obvious. While construction and agriculture are hit hardest, economists now say service industries, logistics networks, and even white-collar knowledge work — via disrupted commutes and degraded air quality — are increasingly exposed.
         </p>
 
